@@ -1,0 +1,59 @@
+version: '3.6'
+services:
+  telegraf:
+    build:
+      context: .
+      dockerfile: Dockerfile  # Указываем путь к кастомному Dockerfile    
+#    image: telegraf
+    container_name: telegraf
+      #command: /bin/bash -c "whoami && ls -l /etc/telegraf/"
+    command: /bin/bash -c "cd cmd/telegraf && go run ./"
+    restart: always
+    volumes:
+    - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
+    - /var/run/docker.sock:/var/run/docker.sock
+      #- ./telegraf_cache:/etc/telegraf/.cache:rw
+      #- ./telegraf_cache/go-build:/etc/telegraf/.cache/go-build
+    depends_on:
+      - influxdb
+    links:
+      - influxdb
+    ports:
+    - '8125:8125'
+    - '57400:57400'
+
+  influxdb:
+    image: influxdb:1.8-alpine
+    container_name: influxdb
+    restart: always
+    environment:
+      - INFLUXDB_DB=influx
+      - INFLUXDB_ADMIN_USER=admin
+      - INFLUXDB_ADMIN_PASSWORD=admin
+      - INFLUXDB_HTTP_LOG_ENABLED=true
+      - INFLUXDB_LOGGING_LEVEL=debug
+    ports:
+      - '8086:8086'
+    volumes:
+      - influxdb_data:/var/lib/influxdb
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-server
+    restart: always
+    depends_on:
+      - influxdb
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_INSTALL_PLUGINS=
+    links:
+      - influxdb
+    ports:
+      - '3000:3000'
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+volumes:
+  grafana_data: {}
+  influxdb_data: {}
