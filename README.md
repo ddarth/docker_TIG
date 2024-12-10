@@ -13,9 +13,8 @@ The setup includes the following components:
 
 ## Clone repositary
 ```bash
-mkdir docker_TIG
-cd docker_TIG
 git clone https://github.com/ddarth/docker_TIG.git
+cd docker_TIG
 ```
 
 ### (Optional) Disable proxy
@@ -35,6 +34,10 @@ ENV no_proxy="localhost,127.0.0.1"
 sudo docker-compose up -d
 ```
 
+## Create database for influx (replace <ENTER_YOUR_IP>)
+```bash
+curl -i -XPOST http://<ENTER_YOUR_IP>:8086/query --data-urlencode 'q=CREATE DATABASE influx'
+```
 
 # Debug
 
