@@ -30,12 +30,13 @@ services:
       - INFLUXDB_DB=influx
       - INFLUXDB_ADMIN_USER=admin
       - INFLUXDB_ADMIN_PASSWORD=admin
-      - INFLUXDB_HTTP_LOG_ENABLED=true
-      - INFLUXDB_LOGGING_LEVEL=debug
+        #      - INFLUXDB_HTTP_LOG_ENABLED=true
+        #      - INFLUXDB_LOGGING_LEVEL=debug
     ports:
       - '8086:8086'
     volumes:
       - influxdb_data:/var/lib/influxdb
+        #      - ./influxdb.conf:/etc/influxdb/influxdb.conf
 
   grafana:
     image: grafana/grafana
@@ -53,6 +54,7 @@ services:
       - '3000:3000'
     volumes:
       - grafana_data:/var/lib/grafana
+
 
 volumes:
   grafana_data: {}

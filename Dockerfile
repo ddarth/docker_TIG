@@ -1,21 +1,14 @@
-# Используем официальный образ Telegraf в качестве основы
+# Using the Telegraf image as a base
 FROM telegraf:latest
-#FROM golang:1.23
 
-
+# Proxy settings (Comment out if not needed)
 ENV http_proxy="http://192.168.77.205:9909/"
 ENV https_proxy="http://192.168.77.205:9909/"
 ENV no_proxy="localhost,127.0.0.1"
-#ENV http_proxy="socks5h://localhost:9908"
-#ENV https_proxy="socks5h://localhost:9908"
 
-# Устанавливаем необходимые зависимости
+# Install required dependencies
 RUN apt-get \
-#-o Acquire::http::proxy="socks5h://localhost:9908" \
-#-o Acquire::https::proxy="socks5h://localhost:9908" \
 update && apt-get \
-#-o Acquire::http::proxy="socks5h://localhost:9908" \
-#-o Acquire::https::proxy="socks5h://localhost:9908" \
 install -y \
     curl \
     unzip \
@@ -26,67 +19,57 @@ install -y \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
-# Устанавливаем Go (пакет Go должен быть доступен по указанному пути)
+# Download and install Go (if errors occur, verify the URLs)
 RUN curl -O https://dl.google.com/go/go1.17.1.linux-amd64.tar.gz && \
     tar -C /usr/local -xzf go1.17.1.linux-amd64.tar.gz && \
     rm go1.17.1.linux-amd64.tar.gz
 
-# Устанавливаем протоколы для gRPC
+# Install the protoc module
 RUN curl -L -o protoc-3.11.4-linux-x86_64.zip https://github.com/protocolbuffers/protobuf/releases/download/v3.11.4/protoc-3.11.4-linux-x86_64.zip && \
     unzip protoc-3.11.4-linux-x86_64.zip -d /usr/local && \
     rm protoc-3.11.4-linux-x86_64.zip
 
-# Устанавливаем переменные окружения для Go
+# Set environment variables for Go
 ENV GOROOT=/usr/local/go
 ENV GOPATH=/usr/local/goWorkplace
 ENV PATH=$PATH:$GOROOT/bin:$GOPATH/bin
 
-# Проверка версии Go (для отладки)
+# Check Go version (for debugging purposes)
 RUN go version
 
-# Устанавливаем gRPC-плагин для Go
-#RUN go get -u github.com/golang/protobuf/protoc-gen-go
+# Install the gRPC plugin for Go
 RUN go install github.com/golang/protobuf/protoc-gen-go@v1.5.0
 
-# Клонируем репозиторий Telegraf Huawei Plugin
-RUN git clone --branch release-1.20 https://github.com/influxdata/telegraf.git /opt/telegraf
+# Clone the Telegraf repository
+#RUN git clone --branch release-1.20 https://github.com/influxdata/telegraf.git /opt/telegraf
+RUN git clone --branch release-1.23 https://github.com/influxdata/telegraf.git /opt/telegraf
 
-# Клонируем репозиторий Telegraf Huawei Plugin
+# Clone the Telegraf Huawei Plugin repository
 RUN git clone https://github.com/HuaweiDatacomm/telegraf-huawei-plugin.git /opt/telegraf-huawei-plugin
 
 
-# Устанавливаем необходимые скрипты и зависимости для Telegraf Huawei Plugin
+# Install required scripts and dependencies for the Telegraf Huawei Plugin
 WORKDIR /opt/telegraf-huawei-plugin
 ENV TELEGRAFROOT=/opt/telegraf
 RUN chmod +x install.sh && ./install.sh
 
-# Патчим proto файл
-#RUN sed -i '/^package \S*;/a option go_package="/";' test.proto
-
-# Копируем proto файлы Huawei
+# Copy Huawei proto files
 RUN git clone https://github.com/HuaweiDatacomm/proto.git /opt/proto
 
-# Патчим файл huawei-debug.proto
-#RUN cp /opt/proto/network-router/8.22.0/huawei-debug.proto /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto && \
-#    cd /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto && \
-#    sed -i '/^package \S*;/a option go_package="/huawei_debug";' huawei-debug.proto && \
-#    protoc --go_out=plugins=grpc:. huawei-debug.proto && \
-#    cat huawei-debug.proto
-
-# Список файлов (без расширений .proto), который вы хотите скопировать и обработать
+# Patch *.proto files required for Telegraf compilation
 ARG PROTO_FILES="huawei-debug huawei-ifm huawei-twamp-controller"  # Указывайте файлы без расширения .proto
 
 ARG CACHE_BUST
 
 RUN for file in $PROTO_FILES; do \
-        # Копируем файлы .proto в нужную директорию
+        # Copy .proto files to the required directory
         cp /opt/proto/network-router/8.22.0/$file.proto /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto && \
         cd /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto && \
-        # Подставляем имя файла (без расширения) в команду sed
+        # Add package name for patching the *.proto file (add "option go_package=/")
         sed -i "/^package \S*;/a option go_package=\"/$file\";" $file.proto && \
-        # Генерируем Go-код с помощью protoc
+        # Generate Go code using protoc based on proto files
         protoc --go_out=plugins=grpc:. $file.proto && \
-        # Выводим содержимое файла
+        # (Optional) Output the contents of the patched file
         echo "Added:" && \
         cat $file.proto | grep go_package &&\
         echo "  to file $file.proto" ; \
@@ -94,21 +77,17 @@ RUN for file in $PROTO_FILES; do \
 
 RUN ls -l /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto
 
-# Хак для отключения кэширования (передается через агрумент при build)
+# Cache-busting hack (passed via a build argument)
 ARG CACHE_BUST
 
-RUN ls -l /opt/telegraf/plugins/parsers/
-RUN ls -l /opt/telegraf/plugins/parsers/huawei_grpc_gpb/
-RUN ls -l
-RUN ls -l /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto
-RUN cat /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/HuaweiTelemetry.go
-RUN cat /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/huawei-debug.proto
+# RUN ls -l /opt/telegraf/plugins/parsers/
+# RUN ls -l /opt/telegraf/plugins/parsers/huawei_grpc_gpb/
+# RUN ls -l
+# RUN ls -l /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto
+# RUN cat /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/HuaweiTelemetry.go
+# RUN cat /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/huawei-debug.proto
 
-# Делаем необходимые изменения в коде (например, в HuaweiTelemetry.go)
-#RUN sed -i 's#//"github.com/influxdata/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/huawei_debug"#"github.com/influxdata/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/huawei_debug"#' /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/HuaweiTelemetry.go
-#RUN sed -i 's#//PathKey#PathKey#g' /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/HuaweiTelemetry.go
-
-
+# Patch HuaweiTelemetry.go to add required modules in the import section
 RUN ImportPaths="// Patched by docker"; \
     for file in $PROTO_FILES; do \
         # Формируем строки с нужным форматом для каждого файла
@@ -117,40 +96,41 @@ RUN ImportPaths="// Patched by docker"; \
     echo "$ImportPaths" && \
     sed -i "s#//\"github.com/influxdata/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/huawei_debug\"#$ImportPaths#" /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/HuaweiTelemetry.go
 
-# Устанавливаем переменную окружения для использования в Go-скрипте
+# Patch HuaweiTelemetry.go to add required modules in "var pathTypeMap = map[PathKey][]reflect.Type{" section
+# Set environment variable for use in the Go script
 ENV PROTO_FILES=$PROTO_FILES
 
-# Копируем Go-скрипт в контейнер
+# Copy the external Go script for convert class names
 COPY generate_paths.go .
 
-# Компилируем Go-скрипт
+# Compile the Go script
 RUN go build -o generate_paths generate_paths.go
 
-# Запускаем скрипт и сохраняем вывод в файл
+# Run the script and save its output to a file
 RUN ./generate_paths > generated_paths.txt
 
-# (Опционально) Выводим сгенерированный файл для отладки
+# (Optional) Output the generated file for debugging
 RUN cat generated_paths.txt
 
 RUN sed -i "\/\/PathKey/r generated_paths.txt" /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/HuaweiTelemetry.go
-
+# (Optional) Output the patched file
 RUN cat /opt/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/HuaweiTelemetry.go
+
+
 RUN go version
 
-# Переходим в директорию с исходным кодом Telegraf
+# Change to the Telegraf source code directory
 WORKDIR /opt/telegraf
 
-# Строим Telegraf
+# Build Telegraf
 RUN make
 
-#RUN sed -i 's#service_address = ":"#service_address = ":57400"#g' telegraf.conf
-
-# Копируем файл конфигурации telegraf
+# Copy the Telegraf configuration file
 COPY ./telegraf.conf /etc/telegraf/telegraf.conf
 
-# Создаем директории для go cache
+# Create directories for Go cache
 RUN mkdir -p /etc/telegraf/.cache && chown -R telegraf:telegraf /etc/telegraf/.cache
 
-# Запускаем Telegraf
+# Start Telegraf
 CMD ["telegraf"]
 

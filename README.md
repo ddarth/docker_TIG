@@ -1,4 +1,42 @@
-# First run
+# Docker TIG (Telegraf, InfluxDB, Grafana) with Huawei Telemetry Plugin
+
+This project automates the creation of a Docker environment that compiles Telegraf with the [Telegraf Huawei Plugin](https://github.com/HuaweiDatacomm/telegraf-huawei-plugin/tree/main). By default, the plugin is configured to support Huawei Telemetry in **dial-out mode**.
+
+The setup includes the following components:
+- **Telegraf**: With the Huawei Telemetry plugin for collecting and parsing data.
+- **InfluxDB**: As the time-series database to store telemetry data.
+- **Grafana**: For visualizing telemetry data in real-time.
+
+---
+
+# Install
+
+## Clone repositary
+```bash
+mkdir docker_TIG
+cd docker_TIG
+git clone https://github.com/ddarth/docker_TIG.git
+```
+
+### (Optional) Disable proxy
+```bash
+vi Dockerfile
+```
+Comment this lines if no proxy required
+```bash
+# Proxy settings (Comment if no need)
+ENV http_proxy="http://192.168.77.205:9909/"
+ENV https_proxy="http://192.168.77.205:9909/"
+ENV no_proxy="localhost,127.0.0.1"
+```
+
+# Run
+```bash
+sudo docker-compose up -d
+```
+
+
+# Debug
 
 ## Build telegraf image with huawei_telemetry plugin
 ```bash
