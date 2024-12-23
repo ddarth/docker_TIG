@@ -1,5 +1,6 @@
 # Using the Telegraf image as a base
-FROM telegraf:latest
+#FROM telegraf:latest
+FROM golang:1.17.1-buster as git-telegraf-huawei
 
 # Proxy settings (Comment out if not needed)
 ENV http_proxy="http://192.168.77.205:9909/"
@@ -57,7 +58,7 @@ RUN chmod +x install.sh && ./install.sh
 RUN git clone https://github.com/HuaweiDatacomm/proto.git /opt/proto
 
 # Patch *.proto files required for Telegraf compilation
-ARG PROTO_FILES="huawei-debug huawei-ifm huawei-twamp-controller"  # Указывайте файлы без расширения .proto
+ARG PROTO_FILES="huawei-debug huawei-ifm huawei-twamp-controller"  # Set needed proto files without .proto (at the end)
 
 ARG CACHE_BUST
 
@@ -90,7 +91,7 @@ ARG CACHE_BUST
 # Patch HuaweiTelemetry.go to add required modules in the import section
 RUN ImportPaths="// Patched by docker"; \
     for file in $PROTO_FILES; do \
-        # Формируем строки с нужным форматом для каждого файла
+        # Create strings with needed format for each file
         ImportPaths="$ImportPaths\n\"github.com/influxdata/telegraf/plugins/parsers/huawei_grpc_gpb/telemetry_proto/$file\"" ; \
     done && \
     echo "$ImportPaths" && \
@@ -125,11 +126,10 @@ WORKDIR /opt/telegraf
 # Build Telegraf
 RUN make
 
+FROM telegraf:1.23.4
 # Copy the Telegraf configuration file
 COPY ./telegraf.conf /etc/telegraf/telegraf.conf
-
-# Create directories for Go cache
-RUN mkdir -p /etc/telegraf/.cache && chown -R telegraf:telegraf /etc/telegraf/.cache
+COPY --from=git-telegraf-huawei /opt/telegraf/telegraf /usr/bin/telegraf
 
 # Start Telegraf
 CMD ["telegraf"]

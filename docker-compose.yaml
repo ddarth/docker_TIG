@@ -6,8 +6,8 @@ services:
       dockerfile: Dockerfile  # Указываем путь к кастомному Dockerfile    
 #    image: telegraf
     container_name: telegraf
-      #command: /bin/bash -c "whoami && ls -l /etc/telegraf/"
-    command: /bin/bash -c "cd cmd/telegraf && go run ./"
+    #command: /bin/bash -c "whoami && ls -l /etc/telegraf/"
+    # command: /bin/bash -c "cd cmd/telegraf && go run ./"
     restart: always
     volumes:
     - ./telegraf.conf:/etc/telegraf/telegraf.conf:ro
@@ -54,6 +54,8 @@ services:
       - '3000:3000'
     volumes:
       - grafana_data:/var/lib/grafana
+      - ./grafana/provisioning/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./grafana/dashboards:/etc/grafana/dashboards
 
 
 volumes:
