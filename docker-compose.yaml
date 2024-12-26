@@ -21,6 +21,7 @@ services:
     ports:
     - '8125:8125'
     - '57400:57400'
+    #- '57401:57401'
 
   influxdb:
     image: influxdb:1.8-alpine
@@ -57,6 +58,21 @@ services:
       - ./grafana/provisioning/dashboards.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
       - ./grafana/dashboards:/etc/grafana/dashboards
 
+  gnmic1:
+    image: ghcr.io/openconfig/gnmic:latest
+    container_name: gnmic1
+    volumes:
+      - ./gnmic1.yaml:/app/gnmic.yaml:ro
+#command: "subscribe --config /app/gnmic.yaml"
+#command: "listen -a 0.0.0.0:57400"
+    command: "listen -a 0.0.0.0:57401 --config /app/gnmic.yaml --debug --insecure"
+    # networks:
+    #   - gnmic-net
+    ports:
+      - 9804:9804
+      - 57401:57401
+    # depends_on:
+    #   - consul-agent 
 
 volumes:
   grafana_data: {}

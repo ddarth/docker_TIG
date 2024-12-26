@@ -1,27 +1,66 @@
-# Docker TIG (Telegraf, InfluxDB, Grafana) with Huawei Telemetry Plugin
+# Docker TIG + gNMIc stack (Telegraf, InfluxDB, Grafana) with Huawei Telemetry Plugin
 
-This project automates the creation of a Docker environment that compiles Telegraf with the [Telegraf Huawei Plugin](https://github.com/HuaweiDatacomm/telegraf-huawei-plugin/tree/main). By default, the plugin is configured to support Huawei Telemetry in **dial-out mode**.
+```
+┌────────┐ ┌────────┐ ┌────────┐
+│ Huawei │ │ Cisco  │ │ Nokia  │
+│ Device │ │ Device │ │ Device │
+└──────┬─┘ └─┬──────┘ └────┬───┘
+       │     │             │    
+       │     │             │    
+       │   Telemetry data  │    
+       │     │             │    
+       │     │             │    
+    ┌──▼─────▼─┐      ┌────▼───┐
+    │ Telegraf │      │ gNMIc  │
+    └─────────┬┘      └┬───────┘
+              │        │        
+             ┌▼────────▼┐       
+             │ InfluxDB │       
+             └─────┬────┘       
+                   │            
+                   │            
+             ┌─────▼────┐       
+             │ Grafana  │       
+             └──────────┘       
+```
+
+This project simplifies the setup of a telemetry monitoring stack using Docker. It allows network engineers to easily collect, store, and visualize telemetry data from Huawei, Nokia, and Cisco devices. By default, the Huawei Telemetry Plugin is configured to support **dial-out mode** telemetry.
 
 The setup includes the following components:
 - **Telegraf**: With the Huawei Telemetry plugin for collecting and parsing data.
 - **InfluxDB**: As the time-series database to store telemetry data.
 - **Grafana**: For visualizing telemetry data in real-time.
+- **gNMIc**: For collecting data from Nokia devices in dial-out mode.
 
 ---
 
-# Install
+# Table of Contents
+1. [Installation](#installation)
+2. [Running the Stack](#running-the-stack)
+3. [Configuration on Network Devices](#configuration-on-network-devices)
+    - [Huawei](#huawei)
+    - [Nokia](#nokia)
+    - [Cisco](#cisco)
+4. [Debugging](#debugging)
+5. [Additional Notes](#additional-notes)
 
-## Clone repositary
+---
+
+# Installation
+
+## Clone the Repository
 ```bash
+# Clone the repository to your local machine
 git clone https://github.com/ddarth/docker_TIG.git
 cd docker_TIG
 ```
 
-### (Optional) Disable proxy
+### (Optional) Disable Proxy
+If your environment does not require a proxy, edit the `Dockerfile` to comment out the proxy settings:
 ```bash
 vi Dockerfile
 ```
-Comment this lines if no proxy required
+Comment out the following lines:
 ```bash
 # Proxy settings (Comment if no need)
 ENV http_proxy="http://192.168.11.205:9909/"
@@ -29,53 +68,35 @@ ENV https_proxy="http://192.168.11.205:9909/"
 ENV no_proxy="localhost,127.0.0.1"
 ```
 
-# Run
+# Running the Stack
+
+## Start the Stack
 ```bash
 sudo docker-compose up -d
 ```
 
-## Create database for influx (replace <ENTER_YOUR_IP>)
+## Create the Database for InfluxDB
+Replace `<ENTER_YOUR_HOST_IP>` with the IP address of your host:
 ```bash
-curl -i -XPOST http://<ENTER_YOUR_IP>:8086/query --data-urlencode 'q=CREATE DATABASE influx'
+curl -i -XPOST http://<ENTER_YOUR_HOST_IP>:8086/query --data-urlencode 'q=CREATE DATABASE influx'
 ```
 
-# (Optional) Remove unused imagas after build process
+## (Optional) Remove Unused Images
+After the build process, you can clean up unused Docker images:
 ```bash
 sudo docker system prune -a
 ```
+> **Warning**: Be careful! This command removes all unused Docker images.
 
-# Debug
+---
 
-## Build telegraf image with huawei_telemetry plugin
-```bash
-sudo docker-compose build --progress plain
-```
+# Configuration on Network Devices
 
-### for debugging cache can be disabled by
-```bash
-sudo docker-compose build --build-arg CACHE_BUST=$(date +%s) --progress plain
-```
-
-# Start
-```bash
-sudo docker-compose up
-```
-
-# Stop
-```bash
-sudo docker-compose down
-```
-
-# Restart single container
-```bash
-sudo docker-compose restart telegraf
-```
-
-# Configuration on network devices
 ## Huawei
-Configure twamp-light client and sender
-For example:
-```
+
+### Configure TWAMP-Light Client and Sender
+Example:
+```plaintext
 #
 nqa twamp-light
  client
@@ -86,23 +107,139 @@ nqa twamp-light
   test start-continual test-session 102
 #
 ```
-Configure telemetry in dial-out mode
+
+### Configure TWAMP-Light Reflector
+```plaintext
+nqa twamp-light
+ responder
+  test-session 100 local-ip 192.168.0.169 remote-ip 192.168.0.168 local-port 64694 remote-port 64694 description Link-1
+  test-session 101 local-ip 192.168.0.171 remote-ip 192.168.0.170 local-port 64694 remote-port 64694 description Link-1
+#
 ```
+
+### Configure Telemetry in Dial-Out Mode
+```plaintext
 telemetry
  #
  sensor-group twampSensors
-# Interface example
-#  sensor-path huawei-ifm:ifm/interfaces/interface[name="GigabitEthernet0/2/0"]/mib-statistics
+  # Interface example
+  sensor-path huawei-ifm:ifm/interfaces/interface[name="GigabitEthernet0/2/0"]/mib-statistics
+  # TWAMP-Light example
   sensor-path huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics
  #
  destination-group gNMI1
   ipv4-address 192.168.10.1 port 57400 protocol grpc no-tls
  #
  subscription subscription1
-# Set your source interface if need
-#  local-source-interface LoopBack0
+  # Set your source interface if needed
+  # local-source-interface LoopBack0
   encoding json
   sensor-group twampSensors sample-interval 5000
   destination-group gNMI1
 #
 ```
+> **Note**: Tested on V800R022 software on ATN910 and NE8000.
+
+## Nokia
+
+### Configure TWAMP-Light Client and Sender
+Example:
+```plaintext
+/configure oam-pm
+        session "My_session_name" test-family ip session-type proactive create
+            meas-interval 1-min create
+            exit
+            ip
+                dest-udp-port 64373
+                destination 192.168.0.187
+                router-instance "Base"
+                source 192.168.0.186
+                source-udp-port 64383
+                twamp-light test-id 2002 create
+                    pad-size 1454
+                    record-stats delay-and-loss
+                    no shutdown
+                exit
+            exit
+        exit
+```
+
+### Configure Telemetry in Dial-Out Mode
+```plaintext
+/configure system telemetry
+            destination-group "gNMI1" create
+                allow-unsecure-connection
+                tcp-keepalive
+                    no shutdown
+                exit
+                destination 192.168.10.1 port 57401 create
+                    router-instance "Base"
+                exit
+            exit
+            sensor-groups
+                sensor-group "twamp-stats" create
+                    # TWAMP-Light example
+                    path "/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval[duration=raw]" create
+                    exit
+                    # Interface example
+                    path "/state/port[port-id=1/1/31]/ethernet/statistics/out-octets" create
+                    exit
+                    path "/state/port[port-id=1/1/32]/ethernet/statistics/out-octets" create
+                    exit
+                exit
+            exit
+            persistent-subscriptions
+                subscription "subscription1" create
+                    destination-group "gNMI1"
+                    mode sample
+                    sensor-group "twamp-stats"
+                    local-source-address 192.168.1.16
+                    no shutdown
+                exit
+            exit
+```
+> **Note**: Tested on 23.10 IXR-e, 7750.
+
+> **Warning**: Telemetry collector port for Nokia devices is different than Huawei because gNMIc is used.
+
+## Cisco
+Cisco devices have not been tested. To configure Cisco devices, use the [Cisco Model-Driven Telemetry (MDT) Input Plugin](https://github.com/influxdata/telegraf/blob/master/plugins/inputs/cisco_telemetry_mdt/README.md).
+
+---
+
+# Debugging
+
+## Build Telegraf Image with Huawei Telemetry Plugin
+```bash
+sudo docker-compose build --progress plain
+```
+
+### Disable Docker Cache for Debugging
+```bash
+sudo docker-compose build --build-arg CACHE_BUST=$(date +%s) --progress plain
+```
+
+## Manage the Stack
+
+### Start the Stack
+```bash
+sudo docker-compose up
+```
+
+### Stop the Stack
+```bash
+sudo docker-compose down
+```
+
+### Restart a Single Container
+```bash
+sudo docker-compose restart telegraf
+```
+
+---
+
+# Additional Notes
+
+- Ensure your Docker and `docker-compose` versions are up to date.
+- Test the setup incrementally, verifying each device configuration and data flow in the stack.
+
