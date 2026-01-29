@@ -18,9 +18,441 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 2,
+  "id": 3,
   "links": [],
   "panels": [
+    {
+      "datasource": {
+        "default": true,
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 11,
+        "w": 17,
+        "x": 0,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "targets": [
+        {
+          "alias": "backward/undetermined-available",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "system-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "session_session-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "subscription1",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/undetermined-available"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "backward/unavailable",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "system-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "session_session-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "subscription1",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/unavailable"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "backward/undetermined-unavailable",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "system-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "session_session-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "subscription1",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "C",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/undetermined-unavailable"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "forward/unavailable",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "system-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "session_session-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "subscription1",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "D",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/unavailable"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "forward/undetermined-available",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "system-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "session_session-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "subscription1",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "E",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/undetermined-available"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        },
+        {
+          "alias": "forward/undetermined-unavailable",
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "system-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "session_session-name::tag"
+              ],
+              "type": "tag"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "subscription1",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "F",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/undetermined-unavailable"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "title": "Panel Title",
+      "type": "timeseries"
+    },
     {
       "datasource": {},
       "fieldConfig": {
@@ -82,10 +514,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 14,
+        "h": 20,
         "w": 17,
         "x": 0,
-        "y": 0
+        "y": 11
       },
       "id": 1,
       "options": {
@@ -115,7 +547,7 @@
             },
             {
               "params": [
-                "node_id_str::tag"
+                "host::tag"
               ],
               "type": "tag"
             },
@@ -218,7 +650,7 @@
         "h": 11,
         "w": 17,
         "x": 0,
-        "y": 14
+        "y": 31
       },
       "id": 3,
       "options": {
@@ -248,7 +680,7 @@
             },
             {
               "params": [
-                "node_id_str::tag"
+                "host::tag"
               ],
               "type": "tag"
             },
@@ -335,8 +767,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -351,7 +782,7 @@
         "h": 11,
         "w": 17,
         "x": 0,
-        "y": 25
+        "y": 42
       },
       "id": 2,
       "options": {
@@ -381,7 +812,7 @@
             },
             {
               "params": [
-                "node_id_str::tag"
+                "host::tag"
               ],
               "type": "tag"
             },
@@ -438,6 +869,6 @@
   "timezone": "browser",
   "title": "Twamp lose",
   "uid": "fe6e9dr6d55hcd",
-  "version": 1,
+  "version": 7,
   "weekStart": ""
 }

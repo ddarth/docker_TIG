@@ -1,0 +1,1037 @@
+{
+  "annotations": {
+    "list": [
+      {
+        "builtIn": 1,
+        "datasource": {
+          "type": "grafana",
+          "uid": "-- Grafana --"
+        },
+        "enable": true,
+        "hide": true,
+        "iconColor": "rgba(0, 211, 255, 1)",
+        "name": "Annotations & Alerts",
+        "type": "dashboard"
+      }
+    ]
+  },
+  "description": "TWAMP monitoring for Nokia devices",
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "id": 100,
+      "panels": [],
+      "title": "Overview (MAX values across all sessions)",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Maximum loss percentage across ALL sessions. Any value > 0 indicates a problem.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "max": 100,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.001
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 1
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"loss\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Max Loss %",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Maximum delay across all sessions",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1000
+              },
+              {
+                "color": "red",
+                "value": 5000
+              }
+            ]
+          },
+          "unit": "µs"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 1
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"delay\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Max Delay",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Number of active TWAMP sessions being monitored",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          },
+          "unit": "none"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 1
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"session_session-name\" WHERE \"system-name\" =~ /^${host:regex}$/",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Active Sessions",
+      "transformations": [
+        {
+          "id": "reduce",
+          "options": {
+            "reducers": [
+              "count"
+            ],
+            "fields": ""
+          }
+        }
+      ],
+      "type": "stat"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 6
+      },
+      "id": 101,
+      "panels": [],
+      "title": "Current Status",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Current status of all TWAMP sessions. Sorted by Loss % descending - problems appear at top.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.001
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Loss %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 0.001
+                    },
+                    {
+                      "color": "red",
+                      "value": 1
+                    }
+                  ]
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Delay"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "µs"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Session"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "id": 5,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Loss %"
+          }
+        ]
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT last(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"Loss %\", last(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"Delay\" FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Network Health - Current Status",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "Host": 0,
+              "Session": 1,
+              "Loss %": 2,
+              "Delay": 3
+            },
+            "renameByName": {
+              "session_session-name": "Session",
+              "system-name": "Host"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 15
+      },
+      "id": 102,
+      "panels": [],
+      "title": "Loss Analysis by Time Slots",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Loss percentage analysis across different time windows. Shows trend: if 24h > 0 but Current = 0, problem was resolved.",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.001
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Current"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1h Max"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "6h Max"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "24h Max"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Session"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 16
+      },
+      "id": 6,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "24h Max"
+          }
+        ]
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"Current\" FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\", \"source\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"1h Max\" FROM \"subscription1\" WHERE time > now() - 1h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\", \"source\"",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "table"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"6h Max\" FROM \"subscription1\" WHERE time > now() - 6h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\", \"source\"",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "table"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"24h Max\" FROM \"subscription1\" WHERE time > now() - 24h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\", \"source\"",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Loss Analysis by Time Slots",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "Host": 0,
+              "Session": 1,
+              "Current": 2,
+              "1h Max": 3,
+              "6h Max": 4,
+              "24h Max": 5
+            },
+            "renameByName": {
+              "session_session-name": "Session",
+              "system-name": "Host"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 103,
+      "panels": [],
+      "title": "Loss Timeline",
+      "type": "row"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Historical loss percentage over time for all sessions",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "Loss %",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "barWidthFactor": 0.6,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "line"
+            }
+          },
+          "mappings": [],
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 0.001
+              }
+            ]
+          },
+          "unit": "percent"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 25
+      },
+      "id": 7,
+      "options": {
+        "legend": {
+          "calcs": [
+            "max",
+            "mean"
+          ],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"loss_pct\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"system-name\", \"session_session-name\" fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Loss % Timeline",
+      "type": "timeseries"
+    },
+    {
+      "collapsed": true,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 35
+      },
+      "id": 104,
+      "panels": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "description": "Round-trip delay over time for all sessions",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Delay (µs)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 1000
+                  },
+                  {
+                    "color": "red",
+                    "value": 5000
+                  }
+                ]
+              },
+              "unit": "µs"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 36
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "ce7aji2ql3shsd"
+              },
+              "hide": false,
+              "query": "SELECT mean(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"delay\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"system-name\", \"session_session-name\" fill(null)",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "time_series"
+            }
+          ],
+          "title": "Delay Timeline",
+          "type": "timeseries"
+        }
+      ],
+      "title": "Additional Metrics (Delay)",
+      "type": "row"
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [
+    "twamp",
+    "network",
+    "nokia"
+  ],
+  "templating": {
+    "list": [
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "ce7aji2ql3shsd"
+        },
+        "definition": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"system-name\"",
+        "description": "Filter by Nokia host/device",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Host",
+        "multi": true,
+        "name": "host",
+        "options": [],
+        "query": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"system-name\"",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      },
+      {
+        "allValue": ".*",
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "influxdb",
+          "uid": "ce7aji2ql3shsd"
+        },
+        "definition": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"session_session-name\" WHERE \"system-name\" =~ /^${host:regex}$/",
+        "description": "Filter by TWAMP session name",
+        "hide": 0,
+        "includeAll": true,
+        "label": "Session",
+        "multi": true,
+        "name": "session",
+        "options": [],
+        "query": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"session_session-name\" WHERE \"system-name\" =~ /^${host:regex}$/",
+        "refresh": 2,
+        "regex": "",
+        "skipUrlSync": false,
+        "sort": 1,
+        "type": "query"
+      }
+    ]
+  },
+  "time": {
+    "from": "now-1h",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "TWAMP Nokia",
+  "uid": "twamp-nokia",
+  "version": 1,
+  "weekStart": ""
+}
