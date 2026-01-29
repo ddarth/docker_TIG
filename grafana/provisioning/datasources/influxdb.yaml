@@ -1,0 +1,17 @@
+apiVersion: 1
+
+datasources:
+  - name: InfluxDB
+    type: influxdb
+    uid: ce7aji2ql3shsd
+    access: proxy
+    url: http://influxdb:8086
+    database: influx
+    user: admin
+    password: admin
+    editable: false
+    jsonData:
+      httpMode: POST
+      version: "InfluxQL"
+    secureJsonData:
+      password: admin

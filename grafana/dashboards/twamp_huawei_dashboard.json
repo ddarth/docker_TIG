@@ -139,7 +139,7 @@
               }
             ]
           },
-          "unit": "µs"
+          "unit": "\u00b5s"
         },
         "overrides": []
       },
@@ -212,7 +212,7 @@
               }
             ]
           },
-          "unit": "µs"
+          "unit": "\u00b5s"
         },
         "overrides": []
       },
@@ -434,7 +434,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "µs"
+                "value": "\u00b5s"
               },
               {
                 "id": "decimals",
@@ -450,7 +450,7 @@
             "properties": [
               {
                 "id": "unit",
-                "value": "µs"
+                "value": "\u00b5s"
               },
               {
                 "id": "decimals",
@@ -565,7 +565,7 @@
         "type": "influxdb",
         "uid": "ce7aji2ql3shsd"
       },
-      "description": "Loss percentage analysis across different time windows. Shows trend: if 24h > 0 but Current = 0, problem was resolved.",
+      "description": "Loss percentage in last 5 minutes",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -624,6 +624,131 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Session"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 0,
+        "y": 16
+      },
+      "id": 201,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Current"
+          }
+        ]
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"Current\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 5m AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Loss Analysis - Current (last 5 min)",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "Host": 0,
+              "Session": 1,
+              "Current": 2
+            },
+            "renameByName": {
+              "content.twamp-controller.client.sessions.session.0.id": "Session",
+              "host": "Host"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Maximum loss percentage in last 1 hour",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.001
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
               "options": "1h Max"
             },
             "properties": [
@@ -647,6 +772,131 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Session"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 6,
+        "y": 16
+      },
+      "id": 202,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "1h Max"
+          }
+        ]
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"1h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 1h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Loss Analysis - 1h Maximum",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "Host": 0,
+              "Session": 1,
+              "1h Max": 2
+            },
+            "renameByName": {
+              "content.twamp-controller.client.sessions.session.0.id": "Session",
+              "host": "Host"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Maximum loss percentage in last 6 hours",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.001
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
               "options": "6h Max"
             },
             "properties": [
@@ -667,6 +917,131 @@
               }
             ]
           },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Session"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 120
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 6,
+        "x": 12,
+        "y": 16
+      },
+      "id": 203,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "6h Max"
+          }
+        ]
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"6h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 6h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Loss Analysis - 6h Maximum",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "indexByName": {
+              "Host": 0,
+              "Session": 1,
+              "6h Max": 2
+            },
+            "renameByName": {
+              "content.twamp-controller.client.sessions.session.0.id": "Session",
+              "host": "Host"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Maximum loss percentage in last 24 hours",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.001
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
           {
             "matcher": {
               "id": "byName",
@@ -718,11 +1093,11 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 24,
-        "x": 0,
+        "w": 6,
+        "x": 18,
         "y": 16
       },
-      "id": 6,
+      "id": 204,
       "options": {
         "cellHeight": "sm",
         "footer": {
@@ -749,51 +1124,14 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"Current\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 5m AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"24h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 24h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "ce7aji2ql3shsd"
-          },
-          "hide": false,
-          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"1h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 1h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
-          "rawQuery": true,
-          "refId": "B",
-          "resultFormat": "table"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "ce7aji2ql3shsd"
-          },
-          "hide": false,
-          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"6h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 6h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
-          "rawQuery": true,
-          "refId": "C",
-          "resultFormat": "table"
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "ce7aji2ql3shsd"
-          },
-          "hide": false,
-          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"24h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 24h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
-          "rawQuery": true,
-          "refId": "D",
-          "resultFormat": "table"
         }
       ],
-      "title": "Loss Analysis by Time Slots",
+      "title": "Loss Analysis - 24h Maximum",
       "transformations": [
-        {
-          "id": "merge",
-          "options": {}
-        },
         {
           "id": "organize",
           "options": {
@@ -803,10 +1141,7 @@
             "indexByName": {
               "Host": 0,
               "Session": 1,
-              "Current": 2,
-              "1h Max": 3,
-              "6h Max": 4,
-              "24h Max": 5
+              "24h Max": 2
             },
             "renameByName": {
               "content.twamp-controller.client.sessions.session.0.id": "Session",
@@ -956,7 +1291,7 @@
                 "axisBorderShow": false,
                 "axisCenteredZero": false,
                 "axisColorMode": "text",
-                "axisLabel": "Delay (µs)",
+                "axisLabel": "Delay (\u00b5s)",
                 "axisPlacement": "auto",
                 "barAlignment": 0,
                 "barWidthFactor": 0.6,
@@ -1004,7 +1339,7 @@
                   }
                 ]
               },
-              "unit": "µs"
+              "unit": "\u00b5s"
             },
             "overrides": []
           },
@@ -1061,7 +1396,7 @@
                 "axisBorderShow": false,
                 "axisCenteredZero": false,
                 "axisColorMode": "text",
-                "axisLabel": "Jitter (µs)",
+                "axisLabel": "Jitter (\u00b5s)",
                 "axisPlacement": "auto",
                 "barAlignment": 0,
                 "barWidthFactor": 0.6,
@@ -1109,7 +1444,7 @@
                   }
                 ]
               },
-              "unit": "µs"
+              "unit": "\u00b5s"
             },
             "overrides": []
           },
