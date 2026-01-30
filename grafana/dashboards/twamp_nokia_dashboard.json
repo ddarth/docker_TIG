@@ -101,7 +101,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"loss\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval) fill(null)",
+          "query": "SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS \"loss\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"system-name\", \"session_session-name\" fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -428,7 +428,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT last(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"Loss %\", last(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"Delay\" FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(loss_pct) AS \"Loss %\", last(\"Delay\") AS \"Delay\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct, mean(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"Delay\" FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -590,7 +590,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"Current\" FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(loss_pct) AS \"Current\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -738,7 +738,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"1h Max\" FROM \"subscription1\" WHERE time > now() - 1h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(loss_pct) AS \"1h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 1h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -886,7 +886,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"6h Max\" FROM \"subscription1\" WHERE time > now() - 6h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(loss_pct) AS \"6h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 6h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -1034,7 +1034,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"24h Max\" FROM \"subscription1\" WHERE time > now() - 24h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(loss_pct) AS \"24h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 24h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -1167,7 +1167,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/forward/average-frame-loss-ratio\") * 100 AS \"loss_pct\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"system-name\", \"session_session-name\" fill(null)",
+          "query": "SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS \"loss_pct\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"system-name\", \"session_session-name\" fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
