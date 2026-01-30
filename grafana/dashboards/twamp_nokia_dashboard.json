@@ -1063,12 +1063,310 @@
       "type": "table"
     },
     {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Combined Loss Analysis showing Current, 1h, 6h, and 24h maximum loss percentages",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.001
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Current"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "1h Max"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "6h Max"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "24h Max"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "mode": "basic",
+                  "type": "color-background"
+                }
+              },
+              {
+                "id": "decimals",
+                "value": 2
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Session"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 24,
+        "x": 0,
+        "y": 24
+      },
+      "id": 205,
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true,
+        "sortBy": [
+          {
+            "desc": true,
+            "displayName": "Current"
+          }
+        ]
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(loss_pct) AS \"Current\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "table"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(loss_pct) AS \"1h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 1h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "table"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(loss_pct) AS \"6h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 6h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "rawQuery": true,
+          "refId": "C",
+          "resultFormat": "table"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(loss_pct) AS \"24h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 24h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "rawQuery": true,
+          "refId": "D",
+          "resultFormat": "table"
+        }
+      ],
+      "title": "Loss Analysis - Combined (All Time Windows)",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "system-name": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "session_session-name": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Current": {
+                "aggregations": [
+                  "lastNotNull"
+                ],
+                "operation": "aggregate"
+              },
+              "1h Max": {
+                "aggregations": [
+                  "lastNotNull"
+                ],
+                "operation": "aggregate"
+              },
+              "6h Max": {
+                "aggregations": [
+                  "lastNotNull"
+                ],
+                "operation": "aggregate"
+              },
+              "24h Max": {
+                "aggregations": [
+                  "lastNotNull"
+                ],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {},
+            "indexByName": {
+              "system-name": 0,
+              "session_session-name": 1,
+              "Current (lastNotNull)": 2,
+              "1h Max (lastNotNull)": 3,
+              "6h Max (lastNotNull)": 4,
+              "24h Max (lastNotNull)": 5
+            },
+            "renameByName": {
+              "system-name": "Host",
+              "session_session-name": "Session",
+              "Current (lastNotNull)": "Current",
+              "1h Max (lastNotNull)": "1h Max",
+              "6h Max (lastNotNull)": "6h Max",
+              "24h Max (lastNotNull)": "24h Max"
+            }
+          }
+        }
+      ],
+      "type": "table"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 24
+        "y": 32
       },
       "id": 103,
       "panels": [],
@@ -1142,7 +1440,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 25
+        "y": 33
       },
       "id": 7,
       "options": {
@@ -1182,7 +1480,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 35
+        "y": 43
       },
       "id": 104,
       "panels": [
@@ -1257,7 +1555,7 @@
             "h": 10,
             "w": 24,
             "x": 0,
-            "y": 36
+            "y": 44
           },
           "id": 8,
           "options": {
