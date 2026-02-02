@@ -389,7 +389,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 150
+                "value": 300
               }
             ]
           }
@@ -443,8 +443,8 @@
               "Time": true
             },
             "indexByName": {
-              "Host": 0,
-              "Session": 1,
+              "system-name": 0,
+              "session_session-name": 1,
               "Loss %": 2,
               "Delay": 3
             },
