@@ -880,6 +880,22 @@
         }
       ],
       "title": "Loss % Timeline",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*\\{\\s*session_session-name:\\s*(.*?),\\s*system-name:\\s*(.*?)\\s*\\}",
+            "renamePattern": "$2: $1"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*\\{\\s*system-name:\\s*(.*?),\\s*session_session-name:\\s*(.*?)\\s*\\}",
+            "renamePattern": "$1: $2"
+          }
+        }
+      ],
       "type": "timeseries"
     },
     {
@@ -995,6 +1011,22 @@
             }
           ],
           "title": "Delay Timeline",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\{\\s*session_session-name:\\s*(.*?),\\s*system-name:\\s*(.*?)\\s*\\}",
+                "renamePattern": "$2: $1"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\{\\s*system-name:\\s*(.*?),\\s*session_session-name:\\s*(.*?)\\s*\\}",
+                "renamePattern": "$1: $2"
+              }
+            }
+          ],
           "type": "timeseries"
         }
       ],

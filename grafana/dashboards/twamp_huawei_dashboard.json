@@ -964,6 +964,22 @@
         }
       ],
       "title": "Loss % Timeline",
+      "transformations": [
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*\\{ content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?), host: (.*?) \\}",
+            "renamePattern": "$2: $1"
+          }
+        },
+        {
+          "id": "renameByRegex",
+          "options": {
+            "regex": ".*\\{ host: (.*?), content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?)\\s*\\}",
+            "renamePattern": "$1: $2"
+          }
+        }
+      ],
       "type": "timeseries"
     },
     {
@@ -1079,6 +1095,22 @@
             }
           ],
           "title": "Delay Timeline",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\{ content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?), host: (.*?) \\}",
+                "renamePattern": "$2: $1"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": ".*\\{ host: (.*?), content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?)\\s*\\}",
+                "renamePattern": "$1: $2"
+              }
+            }
+          ],
           "type": "timeseries"
         },
         {
@@ -1184,6 +1216,22 @@
             }
           ],
           "title": "Jitter Timeline",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "jitter \\{.*?content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?),.*?host: (.*?)\\s*\\}",
+                "renamePattern": "$2: $1"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "jitter \\{.*?host: (.*?),.*?content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?)\\s*\\}",
+                "renamePattern": "$1: $2"
+              }
+            }
+          ],
           "type": "timeseries"
         }
       ],
