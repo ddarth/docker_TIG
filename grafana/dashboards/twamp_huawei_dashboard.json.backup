@@ -15,7 +15,7 @@
       }
     ]
   },
-  "description": "TWAMP monitoring for Nokia devices",
+  "description": "TWAMP monitoring for Huawei devices",
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 1,
@@ -72,7 +72,7 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 1
       },
@@ -101,7 +101,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS \"loss\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ GROUP BY time($__interval) fill(null)",
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"loss\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE $timeFilter AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY time($__interval) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -145,8 +145,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 1
       },
       "id": 2,
@@ -174,13 +174,86 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"delay\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ GROUP BY time($__interval) fill(null)",
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.avg-delay\") AS \"delay\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE $timeFilter AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY time($__interval) fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
         }
       ],
       "title": "Max Delay",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "influxdb",
+        "uid": "ce7aji2ql3shsd"
+      },
+      "description": "Maximum jitter across all sessions",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 100
+              },
+              {
+                "color": "red",
+                "value": 500
+              }
+            ]
+          },
+          "unit": "\u00b5s"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 6,
+        "x": 12,
+        "y": 1
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "max"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.2.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.avg-jitter\") AS \"jitter\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE $timeFilter AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY time($__interval) fill(null)",
+          "rawQuery": true,
+          "refId": "A",
+          "resultFormat": "time_series"
+        }
+      ],
+      "title": "Max Jitter",
       "type": "stat"
     },
     {
@@ -210,8 +283,8 @@
       },
       "gridPos": {
         "h": 5,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 18,
         "y": 1
       },
       "id": 4,
@@ -239,7 +312,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"session_session-name\" WHERE \"system-name\" =~ /^${host:regex}$/",
+          "query": "SHOW TAG VALUES FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WITH KEY = \"content.twamp-controller.client.sessions.session.0.id\" WHERE \"host\" =~ /^${host:regex}$/",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -372,6 +445,22 @@
           {
             "matcher": {
               "id": "byName",
+              "options": "Jitter"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "\u00b5s"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
               "options": "Host"
             },
             "properties": [
@@ -389,7 +478,7 @@
             "properties": [
               {
                 "id": "custom.width",
-                "value": 300
+                "value": 120
               }
             ]
           }
@@ -428,7 +517,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(loss_pct) AS \"Loss %\", last(\"Delay\") AS \"Delay\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct, mean(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"Delay\" FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT last(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / last(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"Loss %\", last(\"content.twamp-controller.client.sessions.session.0.statistics.avg-delay\") AS \"Delay\", last(\"content.twamp-controller.client.sessions.session.0.statistics.avg-jitter\") AS \"Jitter\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 5m AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -443,14 +532,15 @@
               "Time": true
             },
             "indexByName": {
-              "system-name": 0,
-              "session_session-name": 1,
+              "Host": 0,
+              "Session": 1,
               "Loss %": 2,
-              "Delay": 3
+              "Delay": 3,
+              "Jitter": 4
             },
             "renameByName": {
-              "session_session-name": "Session",
-              "system-name": "Host"
+              "content.twamp-controller.client.sessions.session.0.id": "Session",
+              "host": "Host"
             }
           }
         }
@@ -475,7 +565,7 @@
         "type": "influxdb",
         "uid": "ce7aji2ql3shsd"
       },
-      "description": "Combined Loss Analysis showing Current, 1h, 6h, and 24h maximum loss percentages",
+      "description": "Combined loss analysis showing Current, 1h, 6h, and 24h maximum values per session",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -508,6 +598,30 @@
           }
         },
         "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Host"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Session"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 300
+              }
+            ]
+          },
           {
             "matcher": {
               "id": "byName",
@@ -599,30 +713,6 @@
                 "value": 2
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Host"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 150
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Session"
-            },
-            "properties": [
-              {
-                "id": "custom.width",
-                "value": 300
-              }
-            ]
           }
         ]
       },
@@ -659,7 +749,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(loss_pct) AS \"Current\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 5m AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"Current\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 5m AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -670,7 +760,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(loss_pct) AS \"1h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 1h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"1h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 1h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
           "rawQuery": true,
           "refId": "B",
           "resultFormat": "table"
@@ -681,7 +771,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(loss_pct) AS \"6h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 6h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"6h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 6h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
           "rawQuery": true,
           "refId": "C",
           "resultFormat": "table"
@@ -692,13 +782,13 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT max(loss_pct) AS \"24h Max\" FROM (SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS loss_pct FROM \"subscription1\" WHERE time > now() - 24h AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time(10s), \"system-name\", \"session_session-name\") GROUP BY \"system-name\", \"session_session-name\"",
+          "query": "SELECT max(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / max(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"24h Max\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 24h AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.id\"",
           "rawQuery": true,
           "refId": "D",
           "resultFormat": "table"
         }
       ],
-      "title": "Loss Analysis - Combined (All Time Windows)",
+      "title": "Loss Analysis - Combined",
       "transformations": [
         {
           "id": "merge",
@@ -708,36 +798,28 @@
           "id": "groupBy",
           "options": {
             "fields": {
-              "system-name": {
+              "host": {
                 "aggregations": [],
                 "operation": "groupby"
               },
-              "session_session-name": {
+              "content.twamp-controller.client.sessions.session.0.id": {
                 "aggregations": [],
                 "operation": "groupby"
               },
               "Current": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "1h Max": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "6h Max": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               },
               "24h Max": {
-                "aggregations": [
-                  "lastNotNull"
-                ],
+                "aggregations": ["lastNotNull"],
                 "operation": "aggregate"
               }
             }
@@ -746,18 +828,20 @@
         {
           "id": "organize",
           "options": {
-            "excludeByName": {},
+            "excludeByName": {
+              "Time": true
+            },
             "indexByName": {
-              "system-name": 0,
-              "session_session-name": 1,
+              "host": 0,
+              "content.twamp-controller.client.sessions.session.0.id": 1,
               "Current (lastNotNull)": 2,
               "1h Max (lastNotNull)": 3,
               "6h Max (lastNotNull)": 4,
               "24h Max (lastNotNull)": 5
             },
             "renameByName": {
-              "system-name": "Host",
-              "session_session-name": "Session",
+              "host": "Host",
+              "content.twamp-controller.client.sessions.session.0.id": "Session",
               "Current (lastNotNull)": "Current",
               "1h Max (lastNotNull)": "1h Max",
               "6h Max (lastNotNull)": "6h Max",
@@ -873,7 +957,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT (difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) - difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/frames-received\"))) / difference(mean(\"/state/oam-pm/session/ip/twamp-light/statistics/loss/measurement-interval/number/backward/available\")) * 100 AS \"loss_pct\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"system-name\", \"session_session-name\" fill(null)",
+          "query": "SELECT mean(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / mean(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"loss_pct\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE $timeFilter AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"host\", \"content.twamp-controller.client.sessions.session.0.id\" fill(null)",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series"
@@ -884,14 +968,14 @@
         {
           "id": "renameByRegex",
           "options": {
-            "regex": ".*\\{\\s*session_session-name:\\s*(.*?),\\s*system-name:\\s*(.*?)\\s*\\}",
+            "regex": ".*\\{ content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?), host: (.*?) \\}",
             "renamePattern": "$2: $1"
           }
         },
         {
           "id": "renameByRegex",
           "options": {
-            "regex": ".*\\{\\s*system-name:\\s*(.*?),\\s*session_session-name:\\s*(.*?)\\s*\\}",
+            "regex": ".*\\{ host: (.*?), content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?)\\s*\\}",
             "renamePattern": "$1: $2"
           }
         }
@@ -1004,7 +1088,7 @@
                 "uid": "ce7aji2ql3shsd"
               },
               "hide": false,
-              "query": "SELECT mean(\"/state/oam-pm/session/ip/twamp-light/statistics/delay/measurement-interval/number/bin-type/round-trip/average\") AS \"delay\" FROM \"subscription1\" WHERE $timeFilter AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"system-name\", \"session_session-name\" fill(null)",
+              "query": "SELECT mean(\"content.twamp-controller.client.sessions.session.0.statistics.avg-delay\") AS \"delay\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE $timeFilter AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"host\", \"content.twamp-controller.client.sessions.session.0.id\" fill(null)",
               "rawQuery": true,
               "refId": "A",
               "resultFormat": "time_series"
@@ -1015,14 +1099,135 @@
             {
               "id": "renameByRegex",
               "options": {
-                "regex": ".*\\{\\s*session_session-name:\\s*(.*?),\\s*system-name:\\s*(.*?)\\s*\\}",
+                "regex": ".*\\{ content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?), host: (.*?) \\}",
                 "renamePattern": "$2: $1"
               }
             },
             {
               "id": "renameByRegex",
               "options": {
-                "regex": ".*\\{\\s*system-name:\\s*(.*?),\\s*session_session-name:\\s*(.*?)\\s*\\}",
+                "regex": ".*\\{ host: (.*?), content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?)\\s*\\}",
+                "renamePattern": "$1: $2"
+              }
+            }
+          ],
+          "type": "timeseries"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "description": "Jitter over time for all sessions",
+          "fieldConfig": {
+            "defaults": {
+              "color": {
+                "mode": "palette-classic"
+              },
+              "custom": {
+                "axisBorderShow": false,
+                "axisCenteredZero": false,
+                "axisColorMode": "text",
+                "axisLabel": "Jitter (\u00b5s)",
+                "axisPlacement": "auto",
+                "barAlignment": 0,
+                "barWidthFactor": 0.6,
+                "drawStyle": "line",
+                "fillOpacity": 10,
+                "gradientMode": "none",
+                "hideFrom": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": false
+                },
+                "insertNulls": false,
+                "lineInterpolation": "linear",
+                "lineWidth": 1,
+                "pointSize": 5,
+                "scaleDistribution": {
+                  "type": "linear"
+                },
+                "showPoints": "auto",
+                "spanNulls": false,
+                "stacking": {
+                  "group": "A",
+                  "mode": "none"
+                },
+                "thresholdsStyle": {
+                  "mode": "off"
+                }
+              },
+              "mappings": [],
+              "min": 0,
+              "thresholds": {
+                "mode": "absolute",
+                "steps": [
+                  {
+                    "color": "green",
+                    "value": null
+                  },
+                  {
+                    "color": "yellow",
+                    "value": 100
+                  },
+                  {
+                    "color": "red",
+                    "value": 500
+                  }
+                ]
+              },
+              "unit": "\u00b5s"
+            },
+            "overrides": []
+          },
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 54
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "calcs": [
+                "max",
+                "mean"
+              ],
+              "displayMode": "table",
+              "placement": "right",
+              "showLegend": true
+            },
+            "tooltip": {
+              "mode": "multi",
+              "sort": "desc"
+            }
+          },
+          "targets": [
+            {
+              "datasource": {
+                "type": "influxdb",
+                "uid": "ce7aji2ql3shsd"
+              },
+              "hide": false,
+              "query": "SELECT mean(\"content.twamp-controller.client.sessions.session.0.statistics.avg-jitter\") AS \"jitter\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE $timeFilter AND \"host\" =~ /^${host:regex}$/ AND \"content.twamp-controller.client.sessions.session.0.id\" =~ /^${session:regex}$/ GROUP BY time($__interval), \"host\", \"content.twamp-controller.client.sessions.session.0.id\" fill(null)",
+              "rawQuery": true,
+              "refId": "A",
+              "resultFormat": "time_series"
+            }
+          ],
+          "title": "Jitter Timeline",
+          "transformations": [
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "jitter \\{.*?content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?),.*?host: (.*?)\\s*\\}",
+                "renamePattern": "$2: $1"
+              }
+            },
+            {
+              "id": "renameByRegex",
+              "options": {
+                "regex": "jitter \\{.*?host: (.*?),.*?content\\.twamp-controller\\.client\\.sessions\\.session\\.0\\.id: (.*?)\\s*\\}",
                 "renamePattern": "$1: $2"
               }
             }
@@ -1030,7 +1235,7 @@
           "type": "timeseries"
         }
       ],
-      "title": "Additional Metrics (Delay)",
+      "title": "Additional Metrics (Delay & Jitter)",
       "type": "row"
     }
   ],
@@ -1039,7 +1244,7 @@
   "tags": [
     "twamp",
     "network",
-    "nokia"
+    "huawei"
   ],
   "templating": {
     "list": [
@@ -1054,15 +1259,15 @@
           "type": "influxdb",
           "uid": "ce7aji2ql3shsd"
         },
-        "definition": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"system-name\"",
-        "description": "Filter by Nokia host/device",
+        "definition": "SHOW TAG VALUES FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WITH KEY = \"host\"",
+        "description": "Filter by Huawei host/device",
         "hide": 0,
         "includeAll": true,
         "label": "Host",
         "multi": true,
         "name": "host",
         "options": [],
-        "query": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"system-name\"",
+        "query": "SHOW TAG VALUES FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WITH KEY = \"host\"",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -1080,19 +1285,19 @@
           "type": "influxdb",
           "uid": "ce7aji2ql3shsd"
         },
-        "definition": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"session_session-name\" WHERE \"system-name\" =~ /^${host:regex}$/",
-        "description": "Filter by TWAMP session name",
+        "definition": "SHOW TAG VALUES FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WITH KEY = \"content.twamp-controller.client.sessions.session.0.id\" WHERE \"host\" =~ /^${host:regex}$/",
+        "description": "Filter by TWAMP session ID",
         "hide": 0,
         "includeAll": true,
         "label": "Session",
         "multi": true,
         "name": "session",
         "options": [],
-        "query": "SHOW TAG VALUES FROM \"subscription1\" WITH KEY = \"session_session-name\" WHERE \"system-name\" =~ /^${host:regex}$/",
+        "query": "SHOW TAG VALUES FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WITH KEY = \"content.twamp-controller.client.sessions.session.0.id\" WHERE \"host\" =~ /^${host:regex}$/",
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
-        "sort": 1,
+        "sort": 3,
         "type": "query"
       }
     ]
@@ -1103,8 +1308,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "TWAMP Nokia",
-  "uid": "twamp-nokia",
+  "title": "TWAMP Huawei",
+  "uid": "twamp-huawei",
   "version": 1,
   "weekStart": ""
 }
