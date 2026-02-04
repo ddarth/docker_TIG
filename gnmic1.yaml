@@ -17,10 +17,10 @@ gnmi-server:
 
 
 processors:
-  # Оставить только "raw" интервалы (самая высокая частота ~10 сек)
-  filter-raw-only:
+  # Пропускать "raw" интервалы статистики И configure данные (без тега measurement-interval_duration)
+  filter-raw-and-configure:
     event-allow:
-      condition: '.tags."measurement-interval_duration" == "raw"'
+      condition: '.tags."measurement-interval_duration" == "raw" or .tags."measurement-interval_duration" == ""'
 
 outputs:
   influx-output:
@@ -28,7 +28,7 @@ outputs:
     url: http://172.28.192.4:8086
     bucket: influx
     event-processors:
-      - filter-raw-only
+      - filter-raw-and-configure
 
 
 
