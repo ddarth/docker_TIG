@@ -17,10 +17,12 @@ gnmi-server:
 
 
 processors:
-  # Пропускать "raw" интервалы статистики И configure данные (без тега measurement-interval_duration)
+  # Allow subscriptionConfig (IP addresses) AND raw statistics only
+  # subscriptionConfig has no measurement-interval_duration tag (null)
+  # subscription1 has "raw" or "1-min" - we only want "raw"
   filter-raw-and-configure:
     event-allow:
-      condition: '.tags."measurement-interval_duration" == "raw" or .tags."measurement-interval_duration" == ""'
+      condition: '.name == "subscriptionConfig" or .tags."measurement-interval_duration" == "raw"'
 
 outputs:
   influx-output:

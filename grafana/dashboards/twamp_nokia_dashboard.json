@@ -392,6 +392,30 @@
                 "value": 300
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Source IP"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Destination IP"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
           }
         ]
       },
@@ -432,10 +456,56 @@
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "ce7aji2ql3shsd"
+          },
+          "hide": false,
+          "query": "SELECT last(\"/configure/oam-pm/session/ip/source\") AS \"Source IP\", last(\"/configure/oam-pm/session/ip/destination\") AS \"Destination IP\" FROM \"subscriptionConfig\" WHERE time >= '1970-01-01' AND \"system-name\" =~ /^${host:regex}$/ AND \"session_session-name\" =~ /^${session:regex}$/ GROUP BY \"system-name\", \"session_session-name\"",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "table"
         }
       ],
       "title": "Network Health - Current Status",
       "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "groupBy",
+          "options": {
+            "fields": {
+              "system-name": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "session_session-name": {
+                "aggregations": [],
+                "operation": "groupby"
+              },
+              "Source IP": {
+                "aggregations": ["lastNotNull"],
+                "operation": "aggregate"
+              },
+              "Destination IP": {
+                "aggregations": ["lastNotNull"],
+                "operation": "aggregate"
+              },
+              "Loss %": {
+                "aggregations": ["lastNotNull"],
+                "operation": "aggregate"
+              },
+              "Delay": {
+                "aggregations": ["lastNotNull"],
+                "operation": "aggregate"
+              }
+            }
+          }
+        },
         {
           "id": "organize",
           "options": {
@@ -445,12 +515,18 @@
             "indexByName": {
               "system-name": 0,
               "session_session-name": 1,
-              "Loss %": 2,
-              "Delay": 3
+              "Source IP (lastNotNull)": 2,
+              "Destination IP (lastNotNull)": 3,
+              "Loss % (lastNotNull)": 4,
+              "Delay (lastNotNull)": 5
             },
             "renameByName": {
               "session_session-name": "Session",
-              "system-name": "Host"
+              "system-name": "Host",
+              "Source IP (lastNotNull)": "Source IP",
+              "Destination IP (lastNotNull)": "Destination IP",
+              "Loss % (lastNotNull)": "Loss %",
+              "Delay (lastNotNull)": "Delay"
             }
           }
         }

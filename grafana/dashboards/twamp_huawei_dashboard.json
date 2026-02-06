@@ -481,6 +481,30 @@
                 "value": 300
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Source IP"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Destination IP"
+            },
+            "properties": [
+              {
+                "id": "custom.width",
+                "value": 150
+              }
+            ]
           }
         ]
       },
@@ -517,7 +541,7 @@
             "uid": "ce7aji2ql3shsd"
           },
           "hide": false,
-          "query": "SELECT last(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / last(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"Loss %\", last(\"content.twamp-controller.client.sessions.session.0.statistics.avg-delay\") AS \"Delay\", last(\"content.twamp-controller.client.sessions.session.0.statistics.avg-jitter\") AS \"Jitter\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 5m AND \"host\" =~ /^${host:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.statistics.description\"",
+          "query": "SELECT last(\"content.twamp-controller.client.sessions.session.0.statistics.send-ip-addr\") AS \"Source IP\", last(\"content.twamp-controller.client.sessions.session.0.statistics.ref-ip-addr\") AS \"Destination IP\", last(\"content.twamp-controller.client.sessions.session.0.statistics.loss-count\") / last(\"content.twamp-controller.client.sessions.session.0.statistics.send-count\") * 100 AS \"Loss %\", last(\"content.twamp-controller.client.sessions.session.0.statistics.avg-delay\") AS \"Delay\", last(\"content.twamp-controller.client.sessions.session.0.statistics.avg-jitter\") AS \"Jitter\" FROM \"huawei-twamp-controller:twamp-controller/client/sessions/session/huawei-twamp-statistics:statistics\" WHERE time > now() - 5m AND \"host\" =~ /^${host:regex}$/ GROUP BY \"host\", \"content.twamp-controller.client.sessions.session.0.statistics.description\"",
           "rawQuery": true,
           "refId": "A",
           "resultFormat": "table"
@@ -534,9 +558,11 @@
             "indexByName": {
               "host": 0,
               "content.twamp-controller.client.sessions.session.0.statistics.description": 1,
-              "Loss %": 2,
-              "Delay": 3,
-              "Jitter": 4
+              "Source IP": 2,
+              "Destination IP": 3,
+              "Loss %": 4,
+              "Delay": 5,
+              "Jitter": 6
             },
             "renameByName": {
               "content.twamp-controller.client.sessions.session.0.statistics.description": "Session",
