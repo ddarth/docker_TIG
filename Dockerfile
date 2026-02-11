@@ -2,10 +2,20 @@
 #FROM telegraf:latest
 FROM golang:1.17.1-buster as git-telegraf-huawei
 
-# Proxy settings (Comment out if not needed)
-ENV http_proxy="http://192.168.77.205:9909/"
-ENV https_proxy="http://192.168.77.205:9909/"
-ENV no_proxy="localhost,127.0.0.1"
+# Proxy settings (configured via build args from .env)
+ARG HTTP_PROXY
+ARG HTTPS_PROXY
+ARG NO_PROXY=localhost,127.0.0.1
+
+# Set proxy environment variables (empty by default)
+ENV http_proxy="${HTTP_PROXY}"
+ENV https_proxy="${HTTPS_PROXY}"
+ENV no_proxy="${NO_PROXY}"
+
+# Fix Debian Buster repositories (moved to archive)
+RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
+    sed -i 's|security.debian.org|archive.debian.org|g' /etc/apt/sources.list && \
+    sed -i '/stretch-updates/d' /etc/apt/sources.list
 
 # Install required dependencies
 RUN apt-get \

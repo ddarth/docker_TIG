@@ -1,0 +1,28 @@
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+
+# Backup files
+*.backup
+*.bak
+
+# Docker volumes
+influxdb_data/
+grafana_data/
+
+# Temporary files
+*.tmp
+*.log
+*.swp
+*~
+
+# IDE files
+.vscode/
+.idea/
+.DS_Store
+
+# Secrets
+secrets/
+*.key
+*.pem

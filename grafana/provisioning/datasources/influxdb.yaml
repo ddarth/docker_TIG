@@ -7,11 +7,10 @@ datasources:
     access: proxy
     url: http://influxdb:8086
     database: influx
-    user: admin
-    password: admin
+    user: $INFLUXDB_ADMIN_USER
     editable: false
     jsonData:
       httpMode: POST
       version: "InfluxQL"
     secureJsonData:
-      password: admin
+      password: $INFLUXDB_ADMIN_PASSWORD

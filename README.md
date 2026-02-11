@@ -49,39 +49,68 @@ The setup includes the following components:
 # Installation
 
 ## Clone the Repository
+
 ```bash
 # Clone the repository to your local machine
 git clone https://github.com/ddarth/docker_TIG.git
 cd docker_TIG
 ```
 
-### (Optional) Disable Proxy
-If your environment does not require a proxy, edit the `Dockerfile` to comment out the proxy settings:
-```bash
-vi Dockerfile
-```
-Comment out the following lines:
-```bash
-# Proxy settings (Comment if no need)
-ENV http_proxy="http://192.168.11.205:9909/"
-ENV https_proxy="http://192.168.11.205:9909/"
-ENV no_proxy="localhost,127.0.0.1"
-```
+## Security Configuration (REQUIRED)
+
+Before first run, you need to configure environment variables:
+
+1. Create .env file from template:
+   ```bash
+   cp .env.example .env
+   ```
+
+2. Edit .env and set secure passwords:
+   ```bash
+   nano .env
+   # Change INFLUXDB_ADMIN_PASSWORD and GF_SECURITY_ADMIN_PASSWORD
+   ```
+
+3. Set restrictive permissions:
+   ```bash
+   chmod 600 .env
+   ```
+
+4. **(Optional)** If proxy is NOT needed, comment out HTTP_PROXY lines in .env:
+   ```bash
+   nano .env
+   # Comment out:
+   #HTTP_PROXY=http://192.168.11.205:9909/
+   #HTTPS_PROXY=http://192.168.11.205:9909/
+   ```
+
+**Important:** .env file contains passwords and should NOT be committed to Git!
 
 # Running the Stack
 
+After creating .env file, start the stack:
+
 ## Start the Stack
+
 ```bash
 sudo docker-compose up -d
 ```
 
+**Note:** To rebuild with new proxy settings:
+```bash
+sudo docker-compose build --no-cache
+sudo docker-compose up -d
+```
+
 ## Create the Database for InfluxDB
+
 Replace `<ENTER_YOUR_HOST_IP>` with the IP address of your host:
 ```bash
 curl -i -XPOST http://<ENTER_YOUR_HOST_IP>:8086/query --data-urlencode 'q=CREATE DATABASE influx'
 ```
 
 ## (Optional) Remove Unused Images
+
 After the build process, you can clean up unused Docker images:
 ```bash
 sudo docker system prune -a
@@ -95,6 +124,7 @@ sudo docker system prune -a
 ## Huawei
 
 ### Configure TWAMP-Light Client and Sender
+
 Example:
 ```plaintext
 #
@@ -109,6 +139,7 @@ nqa twamp-light
 ```
 
 ### Configure TWAMP-Light Reflector
+
 ```plaintext
 nqa twamp-light
  responder
@@ -118,6 +149,7 @@ nqa twamp-light
 ```
 
 ### Configure Telemetry in Dial-Out Mode
+
 ```plaintext
 telemetry
  #
@@ -143,6 +175,7 @@ telemetry
 ## Nokia
 
 ### Configure TWAMP-Light Client and Sender
+
 Example:
 ```plaintext
 /configure oam-pm
@@ -165,6 +198,7 @@ Example:
 ```
 
 ### Configure Telemetry in Dial-Out Mode
+
 ```plaintext
 /configure system telemetry
             destination-group "gNMI1" create
@@ -210,11 +244,13 @@ Cisco devices have not been tested. To configure Cisco devices, use the [Cisco M
 # Debugging
 
 ## Build Telegraf Image with Huawei Telemetry Plugin
+
 ```bash
 sudo docker-compose build --progress plain
 ```
 
 ### Disable Docker Cache for Debugging
+
 ```bash
 sudo docker-compose build --build-arg CACHE_BUST=$(date +%s) --progress plain
 ```
@@ -222,16 +258,19 @@ sudo docker-compose build --build-arg CACHE_BUST=$(date +%s) --progress plain
 ## Manage the Stack
 
 ### Start the Stack
+
 ```bash
 sudo docker-compose up
 ```
 
 ### Stop the Stack
+
 ```bash
 sudo docker-compose down
 ```
 
 ### Restart a Single Container
+
 ```bash
 sudo docker-compose restart telegraf
 ```

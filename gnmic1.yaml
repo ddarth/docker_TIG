@@ -27,7 +27,7 @@ processors:
 outputs:
   influx-output:
     type: influxdb
-    url: http://172.28.192.4:8086
+    url: http://influxdb:8086
     bucket: influx
     event-processors:
       - filter-raw-and-configure
